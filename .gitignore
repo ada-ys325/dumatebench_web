@@ -1,0 +1,15 @@
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+.vitepress_cache/
+.DS_Store
+
+# Python build and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Archives and large datasets
+*.tar.gz
+*.tar.gz.bak
+final_dataset_clean/

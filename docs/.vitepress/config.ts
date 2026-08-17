@@ -1,0 +1,4 @@
+import { defineConfig } from 'vitepress'
+import { site } from '../data/site'
+const sharedSidebar = [{ text: 'Home & benchmark', link: '/' }, { text: 'Paper', link: '/paper' }, { text: 'Skills', link: '/skills' }]
+export default defineConfig({ lang: 'en-US', title: site.name, description: site.description, cleanUrls: true, lastUpdated: true, themeConfig: { siteTitle: site.name, logo: '/dumate.png', nav: site.nav, sidebar: sharedSidebar, socialLinks: [], search: { provider: 'local' }, footer: { message: 'DuMateBench · Research benchmark site', copyright: 'Content marked TBD is awaiting official release information.' } }, head: [['meta', { property: 'og:title', content: site.name }], ['meta', { property: 'og:description', content: site.description }], ['link', { rel: 'canonical', href: site.domain }]] })

@@ -1,0 +1,11 @@
+import DefaultTheme from 'vitepress/theme'
+import type { Theme } from 'vitepress'
+import HomeHero from '../../components/HomeHero.vue'
+import MetricCards from '../../components/MetricCards.vue'
+import FeatureGrid from '../../components/FeatureGrid.vue'
+import LeaderboardTable from '../../components/LeaderboardTable.vue'
+import ResourceCards from '../../components/ResourceCards.vue'
+import Layout from './Layout.vue'
+import './custom.css'
+import './overrides.css'
+export default { extends: DefaultTheme, Layout, enhanceApp({ app }) { app.component('HomeHero', HomeHero); app.component('MetricCards', MetricCards); app.component('FeatureGrid', FeatureGrid); app.component('LeaderboardTable', LeaderboardTable); app.component('ResourceCards', ResourceCards) } } satisfies Theme

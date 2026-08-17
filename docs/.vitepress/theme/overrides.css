@@ -1,0 +1,11 @@
+.section-heading h2 {
+  line-height: 1.35;
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 760px) {
+  .section-heading h2 {
+    line-height: 1.4;
+  }
+}
