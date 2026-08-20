@@ -96,10 +96,11 @@ function applyLanguage() {
   })
   const copyLabel = isChinese.value ? '复制代码' : 'Copy Code'
   document.querySelectorAll<HTMLButtonElement>('button').forEach((el) => {
-    if (el.textContent?.trim() === 'Copy Code' || el.textContent?.trim() === '复制代码') el.textContent = copyLabel
+    if ((el.textContent?.trim() === 'Copy Code' || el.textContent?.trim() === '复制代码') && el.textContent.trim() !== copyLabel) el.textContent = copyLabel
   })
-  document.querySelectorAll<HTMLElement>('button.copy[title="Copy Code"], button.copy[title="复制代码"]').forEach((el) => el.setAttribute('title', copyLabel))
-  document.querySelectorAll<HTMLElement>('.menu-text').forEach((el) => { if (el.textContent?.trim() === 'On this page' || el.textContent?.trim() === '本页内容') el.textContent = isChinese.value ? '本页内容' : 'On this page' })
+  document.querySelectorAll<HTMLElement>('button.copy[title="Copy Code"], button.copy[title="复制代码"]').forEach((el) => { if (el.getAttribute('title') !== copyLabel) el.setAttribute('title', copyLabel) })
+  const menuLabel = isChinese.value ? '本页内容' : 'On this page'
+  document.querySelectorAll<HTMLElement>('.menu-text').forEach((el) => { if ((el.textContent?.trim() === 'On this page' || el.textContent?.trim() === '本页内容') && el.textContent.trim() !== menuLabel) el.textContent = menuLabel })
   const dark = document.documentElement.classList.contains('dark')
   const themeLabel = isChinese.value
     ? (dark ? '切换到浅色模式' : '切换到深色模式')
@@ -122,7 +123,12 @@ function setLanguage(chinese: boolean) {
 onMounted(() => {
   isChinese.value = localStorage.getItem('dumatebench-language') === 'zh'
   applyLanguage()
-  const observer = new MutationObserver(() => { if (!applying) applyLanguage() })
+  let scheduled = false
+  const observer = new MutationObserver(() => {
+    if (applying || scheduled) return
+    scheduled = true
+    requestAnimationFrame(() => { scheduled = false; applyLanguage() })
+  })
   observer.observe(document.body, { childList: true, subtree: true })
 })
 </script>
