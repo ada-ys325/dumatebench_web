@@ -145,8 +145,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.language-switch { display: inline-flex; align-items: center; gap: 3px; padding: 3px; margin: 0 12px; border: 1px solid var(--db-border); border-radius: 10px; background: var(--db-bg-soft); }
-.language-switch button { border: 0; border-radius: 7px; padding: 7px 12px; min-width: 48px; background: transparent; color: var(--db-text-muted); font: inherit; font-size: 13px; cursor: pointer; transition: .2s ease; }
-.language-switch button.active { background: var(--db-bg); color: var(--db-text); box-shadow: 0 0 0 2px #8ce5d1, 0 2px 5px rgba(31, 154, 126, .15); }
-.language-switch button:hover:not(.active) { color: var(--db-primary); }
+.language-switch { display: inline-flex; align-items: center; gap: 3px; padding: 3px; margin: 0 12px; border: 1px solid color-mix(in srgb, var(--db-primary) 20%, transparent); border-radius: 10px; background: var(--db-blue-soft); }
+.language-switch button { border: 0; border-radius: 7px; padding: 7px 12px; min-width: 48px; background: transparent; color: var(--db-primary); font: inherit; font-size: 13px; cursor: pointer; transition: .2s ease; }
+.language-switch button.active { background: var(--db-primary); color: #fff; box-shadow: 0 2px 8px color-mix(in srgb, var(--db-primary) 28%, transparent); }
+.language-switch button:hover:not(.active) { background: color-mix(in srgb, var(--db-primary) 10%, transparent); color: var(--db-primary-hover); }
 </style>
