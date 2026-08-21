@@ -9,8 +9,26 @@
   display: none !important;
 }
 
-.VPDoc { max-width: min(1600px, calc(100vw - 48px)) !important; }
-.VPDoc .content { max-width: none; }
+.VPDoc {
+  max-width: min(1600px, calc(100vw - 48px)) !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+.VPDoc .content {
+  max-width: none;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+/* Home sections use the full site container instead of the narrow article column. */
+.vp-doc .site-shell {
+  position: relative;
+  left: 50%;
+  width: min(var(--db-page), calc(100vw - 48px));
+  max-width: var(--db-page);
+  transform: translateX(-50%);
+}
 
 /* Keep dark-mode score cells in the same restrained dark palette as the table. */
 html.dark .leaderboard-figure .table-wrap,
@@ -27,6 +45,14 @@ html.dark .leaderboard-figure th,
 body.dark .leaderboard-figure th { background: #191d27 !important; border-color: #303746 !important; }
 
 @media (max-width: 760px) {
+  .VPDoc {
+    max-width: 100% !important;
+  }
+
+  .vp-doc .site-shell {
+    width: calc(100vw - 40px);
+  }
+
   .section-heading h2 {
     line-height: 1.4;
   }
