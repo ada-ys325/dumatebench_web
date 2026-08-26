@@ -171,6 +171,29 @@ Object.assign(labels, {
   Component: ['Component', '组成项'], Weight: ['Weight', '权重'], Meaning: ['Meaning', '含义'], 'Artifact-specific quality': ['Artifact-specific quality', '面向具体工件的质量'], 'The macro-average is defined as:': ['The macro-average is defined as:', '宏平均定义为：']
 })
 
+Object.assign(labels, {
+  'Environment & capability coverage': ['Environment & capability coverage', '环境与能力覆盖'],
+  'Designed for complex computer work.': ['Designed for complex computer work.', '面向复杂的计算机工作。'],
+  'Tasks combine multiple capabilities and run under controlled environmental constraints.': ['Tasks combine multiple capabilities and run under controlled environmental constraints.', '任务会组合多种能力，并在受控的环境约束下运行。'],
+  'Environmental complexity': ['Environmental complexity', '环境复杂性'],
+  Insufficient: ['Insufficient', '资源不足'],
+  'Missing tools or dependencies, constrained resources, and limited preinstalled capabilities.': ['Missing tools or dependencies, constrained resources, and limited preinstalled capabilities.', '缺少工具或依赖、资源受限，以及预装能力有限。'],
+  Unstable: ['Unstable', '不稳定'],
+  'Transient network, API, OCR, or tool failures that require recovery.': ['Transient network, API, OCR, or tool failures that require recovery.', '短暂的网络、API、OCR 或工具故障，需要 Agent 进行恢复。'],
+  Noisy: ['Noisy', '噪声环境'],
+  'Historical, duplicate, irrelevant, outdated, or conflicting files and data.': ['Historical, duplicate, irrelevant, outdated, or conflicting files and data.', '历史、重复、无关、过时或相互冲突的文件和数据。'],
+  'These conditions are instantiated in isolated Docker containers so reliability can be evaluated under controlled and repeatable constraints.': ['These conditions are instantiated in isolated Docker containers so reliability can be evaluated under controlled and repeatable constraints.', '这些条件在隔离的 Docker 容器中实例化，使可靠性能够在受控且可重复的约束下进行评估。'],
+  'Capability coverage': ['Capability coverage', '能力覆盖'],
+  'Text and code': ['Text and code', '文本与代码'],
+  'Text generation, coding, and software development · Text 160 · Code 88': ['Text generation, coding, and software development · Text 160 · Code 88', '文本生成、代码编写和软件开发 · 文本 160 · 代码 88'],
+  'Web and information': ['Web and information', '网络与信息'],
+  'Web retrieval, information extraction, and network/API recovery · Web 86': ['Web retrieval, information extraction, and network/API recovery · Web 86', '网络检索、信息提取和网络/API 恢复 · 网络 86'],
+  'Documents and spreadsheets': ['Documents and spreadsheets', '文档与表格'],
+  'DOCX, PDF, PPTX, and Excel workflows · DOCX reading 27 · Excel editing 18': ['DOCX, PDF, PPTX, and Excel workflows · DOCX reading 27 · Excel editing 18', 'DOCX、PDF、PPTX 和 Excel 工作流 · DOCX 阅读 27 · Excel 编辑 18'],
+  'Files and media': ['Files and media', '文件与多媒体'],
+  'File organization, image, video, and audio generation/editing · Files 34 · Multimedia 46': ['File organization, image, video, and audio generation/editing · Files 34 · Multimedia 46', '文件整理、图像、视频和音频生成/编辑 · 文件 34 · 多媒体 46']
+})
+
 function applyLanguage() {
   if (applying) return
   applying = true
