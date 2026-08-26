@@ -34,4 +34,5 @@
 .home-complexity .section-heading{max-width:none}
 .home-complexity .section-heading h2{font-size:clamp(25px,3.33vw,40px)}
 .home-contributions .section-heading h2{font-size:clamp(25px,3.33vw,40px)}
+.home-intro .section-heading,.home-contributions .section-heading{max-width:none}
 </style>

@@ -57,7 +57,32 @@ function formatPercent(value: number) {
       <header class="leaderboard-heading">
         <div class="model-title">
           <span class="model-kicker">{{ viewMode === 'harness' ? 'Base model' : 'Harness' }}</span>
-          <h2>{{ viewMode === 'harness' ? selectedModel : selectedHarness }}</h2>
+          <div v-if="viewMode === 'harness'" class="model-switcher inline-switcher" role="tablist" aria-label="Base model">
+            <button
+              v-for="model in leaderboard.models"
+              :key="model"
+              type="button"
+              role="tab"
+              :aria-selected="selectedModel === model"
+              :class="{ active: selectedModel === model }"
+              @click="selectedModel = model"
+            >
+              {{ model }}
+            </button>
+          </div>
+          <div v-else class="model-switcher inline-switcher" role="tablist" aria-label="Harness">
+            <button
+              v-for="row in leaderboard.rows"
+              :key="row.agent"
+              type="button"
+              role="tab"
+              :aria-selected="selectedHarness === row.agent"
+              :class="{ active: selectedHarness === row.agent }"
+              @click="selectedHarness = row.agent"
+            >
+              {{ row.agent }}
+            </button>
+          </div>
         </div>
         <div class="heading-tools">
           <div class="view-switcher" role="tablist" aria-label="Leaderboard view">
@@ -162,33 +187,6 @@ function formatPercent(value: number) {
       </div>
     </div>
 
-    <div v-if="viewMode === 'harness'" class="model-switcher" role="tablist" aria-label="Base model">
-      <button
-        v-for="model in leaderboard.models"
-        :key="model"
-        type="button"
-        role="tab"
-        :aria-selected="selectedModel === model"
-        :class="{ active: selectedModel === model }"
-        @click="selectedModel = model"
-      >
-        {{ model }}
-      </button>
-    </div>
-
-    <div v-else class="model-switcher" role="tablist" aria-label="Harness">
-      <button
-        v-for="row in leaderboard.rows"
-        :key="row.agent"
-        type="button"
-        role="tab"
-        :aria-selected="selectedHarness === row.agent"
-        :class="{ active: selectedHarness === row.agent }"
-        @click="selectedHarness = row.agent"
-      >
-        {{ row.agent }}
-      </button>
-    </div>
   </figure>
 </template>
 
@@ -220,6 +218,8 @@ function formatPercent(value: number) {
 .model-title {
   display: flex;
   align-items: baseline;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
   min-width: 0;
   gap: 10px;
 }
@@ -449,6 +449,12 @@ function formatPercent(value: number) {
   box-shadow: 0 8px 24px rgba(29, 35, 66, 0.06);
 }
 
+.inline-switcher {
+  flex: 0 1 auto;
+  margin: 0;
+  box-shadow: none;
+}
+
 .model-switcher button {
   min-height: 32px;
   border: 0;
@@ -515,6 +521,8 @@ function formatPercent(value: number) {
   .heading-tools { width: 100%; align-items: flex-start; }
   .view-switcher { width: 100%; }
   .view-switcher button { flex: 1 1 0; }
+  .model-title { width: 100%; align-items: flex-start; }
+  .inline-switcher { width: 100%; }
   .metric-legend { justify-content: flex-start; }
   .score-row {
     grid-template-columns: 26px minmax(0, 1fr);
@@ -525,10 +533,6 @@ function formatPercent(value: number) {
   .metric-stack { grid-column: 2; }
   .harness-name strong { font-size: 16px; }
   .metric-line { grid-template-columns: 56px minmax(70px, 1fr) 48px; gap: 7px; }
-  .model-switcher {
-    width: 100%;
-    border-radius: 13px;
-  }
   .model-switcher button { flex: 1 1 44%; }
 }
 </style>
