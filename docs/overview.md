@@ -1,3 +1,8 @@
+---
+aside: left
+outline: [2, 2]
+---
+
 # Overview
 
 DuMateBench is a benchmark for autonomous agents completing compositional workflows in realistic computer environments. It focuses on cross-capability work that coordinates multiple productivity tools under imperfect conditions, combining real-session context, controlled environmental complexity, and artifact-aware evaluation to measure whether an agent can complete useful work from instruction to verified output.
@@ -30,6 +35,22 @@ We evaluate five agent frameworks paired with four base models, yielding 20 agen
 | Agent-model configurations | 20 |
 | Environment conditions | Insufficient, Unstable, Noisy |
 | Execution environment | Isolated Docker containers |
+
+## Task composition
+
+The 200 tasks span six broad domains. The figure below shows the task share for each domain; the labels include both the percentage and task count from the released distribution.
+
+<figure class="scenario-composition-figure">
+  <img src="/assets/scenario-composition-pie.png" alt="Task composition across six broad domains for 200 DuMateBench tasks." />
+  <figcaption>Task composition by broad domain across 200 DuMateBench tasks.</figcaption>
+</figure>
+
+<style>
+.scenario-composition-figure{margin:28px 0 36px;padding:0;border:0;background:transparent;text-align:center}
+.scenario-composition-figure img{display:block;width:min(100%,980px);height:auto;margin:0 auto}
+.scenario-composition-figure figcaption{max-width:980px;margin:14px auto 0;color:var(--db-text-secondary);font-size:13px;line-height:1.6;text-align:left}
+@media(max-width:760px){.scenario-composition-figure{margin-top:22px}.scenario-composition-figure figcaption{font-size:12px}}
+</style>
 
 ## Task construction
 

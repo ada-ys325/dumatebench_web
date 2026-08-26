@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import leaderboard from '../data/leaderboard.json'
 
 type Metric = 'partial' | 'judge' | 'final'
 type Score = Record<Metric, number>
+type LeaderboardRow = (typeof leaderboard.rows)[number]
 
 const metrics: Array<{ key: Metric; label: string }> = [
   { key: 'partial', label: 'Partial' },
@@ -11,22 +12,18 @@ const metrics: Array<{ key: Metric; label: string }> = [
   { key: 'final', label: 'Final' }
 ]
 
-const activeModel = ref<string | null>(null)
+const selectedModel = ref(leaderboard.models[0])
 
-function score(agent: string, model: string, metric: Metric) {
-  const row = leaderboard.rows.find((item) => item.agent === agent)
-  return (row?.scores as Record<string, Score>)[model][metric]
+function scoresFor(row: LeaderboardRow): Score {
+  return row.scores[selectedModel.value as keyof typeof row.scores] as Score
 }
 
-function isBest(model: string, metric: Metric, value: number) {
-  return value === Math.max(...leaderboard.rows.map((row) => score(row.agent, model, metric)))
-}
+const selectedRows = computed(() => {
+  return [...leaderboard.rows].sort((a, b) => scoresFor(b).final - scoresFor(a).final)
+})
 
-function modelClass(model: string) {
-  return {
-    'model-active': activeModel.value === model,
-    'model-muted': Boolean(activeModel.value && activeModel.value !== model)
-  }
+function isBest(metric: Metric, value: number) {
+  return value === Math.max(...leaderboard.rows.map((row) => scoresFor(row)[metric]))
 }
 
 function formatPercent(value: number) {
@@ -36,104 +33,360 @@ function formatPercent(value: number) {
 
 <template>
   <figure class="leaderboard-figure site-shell">
-    <div class="table-frame" @mouseleave="activeModel = null">
-      <div class="table-wrap">
-        <table>
-          <colgroup>
-            <col class="agent-column" />
-            <template v-for="model in leaderboard.models" :key="`${model}-columns`">
-              <col v-for="metric in metrics" :key="`${model}-${metric.key}-column`" />
-            </template>
-          </colgroup>
-          <thead>
-            <tr class="model-row">
-              <th class="agent-heading" rowspan="2" scope="col">Agent</th>
-              <th
-                v-for="model in leaderboard.models"
-                :key="model"
-                class="model-heading"
-                :class="modelClass(model)"
-                :colspan="metrics.length"
-                scope="colgroup"
-                @mouseenter="activeModel = model"
+    <div class="leaderboard-card">
+      <header class="leaderboard-heading">
+        <div class="model-title">
+          <span class="model-kicker">Base model</span>
+          <h2>{{ selectedModel }}</h2>
+        </div>
+        <div class="metric-legend" aria-label="Metrics">
+          <span v-for="metric in metrics" :key="metric.key" class="legend-item">
+            <i class="legend-dot" :class="`metric-${metric.key}`" aria-hidden="true" />
+            {{ metric.label }}
+          </span>
+        </div>
+      </header>
+
+      <div class="score-list">
+        <article
+          v-for="(row, index) in selectedRows"
+          :key="row.agent"
+          class="score-row"
+          :class="{ dumate: row.agent === 'DuMate' }"
+        >
+          <div class="rank" :aria-label="`Rank ${index + 1}`">{{ index + 1 }}</div>
+          <div class="harness-name">
+            <strong>{{ row.agent }}</strong>
+            <span v-if="row.agent === 'DuMate'" class="featured-badge">DuMate</span>
+          </div>
+          <div class="metric-stack">
+            <div v-for="metric in metrics" :key="metric.key" class="metric-line">
+              <span class="metric-label">{{ metric.label }}</span>
+              <div
+                class="metric-track"
+                role="progressbar"
+                :aria-label="`${row.agent} ${metric.label}`"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                :aria-valuenow="Math.round(scoresFor(row)[metric.key] * 1000) / 10"
               >
-                {{ model }}
-              </th>
-            </tr>
-            <tr class="metric-row">
-              <template v-for="model in leaderboard.models" :key="`${model}-metrics`">
-                <th
-                  v-for="metric in metrics"
-                  :key="`${model}-${metric.key}`"
-                  class="metric-heading"
-                  :class="[modelClass(model), { final: metric.key === 'final' }]"
-                  scope="col"
-                  @mouseenter="activeModel = model"
-                >
-                  {{ metric.label }}
-                </th>
-              </template>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in leaderboard.rows" :key="row.agent" :class="{ dumate: row.agent === 'DuMate' }">
-              <th class="agent-name" scope="row">{{ row.agent }}</th>
-              <template v-for="model in leaderboard.models" :key="`${row.agent}-${model}`">
-                <td
-                  v-for="metric in metrics"
-                  :key="`${row.agent}-${model}-${metric.key}`"
-                  :class="[modelClass(model), { best: isBest(model, metric.key, score(row.agent, model, metric.key)), final: metric.key === 'final' }]"
-                  @mouseenter="activeModel = model"
-                >
-                  {{ formatPercent(score(row.agent, model, metric.key)) }}
-                </td>
-              </template>
-            </tr>
-          </tbody>
-        </table>
+                <span
+                  class="metric-fill"
+                  :class="[`metric-${metric.key}`, { best: isBest(metric.key, scoresFor(row)[metric.key]) }]"
+                  :style="{ width: `${scoresFor(row)[metric.key] * 100}%` }"
+                />
+              </div>
+              <strong class="metric-value" :class="{ best: isBest(metric.key, scoresFor(row)[metric.key]) }">
+                {{ formatPercent(scoresFor(row)[metric.key]) }}
+              </strong>
+            </div>
+          </div>
+        </article>
       </div>
+    </div>
+
+    <div class="model-switcher" role="tablist" aria-label="Base model">
+      <button
+        v-for="model in leaderboard.models"
+        :key="model"
+        type="button"
+        role="tab"
+        :aria-selected="selectedModel === model"
+        :class="{ active: selectedModel === model }"
+        @click="selectedModel = model"
+      >
+        {{ model }}
+      </button>
     </div>
   </figure>
 </template>
 
 <style scoped>
-.leaderboard-figure{width:100%;margin:26px 0 0}
-.table-frame{border:1px solid var(--db-border);border-radius:12px;background:var(--db-bg);overflow:hidden}
-.table-wrap{overflow-x:auto}
-table{width:100%;min-width:1080px;table-layout:fixed;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.agent-column{width:15%}
-th,td{padding:14px 12px;border-right:1px solid var(--db-border);border-bottom:1px solid var(--db-border);text-align:right;white-space:nowrap;font-size:13px;transition:background-color .2s ease,color .2s ease,opacity .2s ease}
-th:last-child,td:last-child{border-right:0}
-.model-row th{height:62px;background:var(--db-bg-soft);color:var(--db-text);font-size:18px;font-weight:800;letter-spacing:-.02em}
-.model-row .agent-heading{background:var(--db-bg-soft);text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--db-text-muted)}
-.model-heading{position:relative;text-align:center;cursor:default}
-.model-heading::after{content:"";position:absolute;inset:9px 8px;border:1px solid transparent;border-radius:8px;pointer-events:none;transition:border-color .2s ease,background-color .2s ease}
-.model-heading.model-active{color:var(--db-primary);background:var(--db-blue-soft)}
-.model-heading.model-active::after{border-color:color-mix(in srgb,var(--db-primary) 42%,transparent);background:color-mix(in srgb,var(--db-primary) 6%,transparent)}
-.metric-row th{height:47px;background:var(--db-bg-soft);color:var(--db-text-muted);font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;white-space:normal;line-height:1.15}
-.metric-row .final{background:color-mix(in srgb,var(--db-blue-soft) 55%,var(--db-bg))}
-.metric-heading{cursor:default}
-.metric-heading.model-active{color:var(--db-primary);background:color-mix(in srgb,var(--db-blue-soft) 82%,var(--db-bg))}
-.agent-name{text-align:left;font-weight:650;color:var(--db-text);overflow:hidden;text-overflow:ellipsis}
-tbody td{color:var(--db-text-secondary)}tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
-.best{font-weight:800;color:var(--db-text)}
-tbody td.final{background:color-mix(in srgb,var(--db-blue-soft) 55%,var(--db-bg))}
-.dumate .agent-name{color:var(--db-primary);font-weight:800}
-.dumate td{background:color-mix(in srgb,var(--db-purple-soft) 55%,var(--db-bg))}
-.dumate td.final{background:color-mix(in srgb,var(--db-purple-soft) 78%,var(--db-bg))}
-.model-muted{opacity:.3}
-.model-active{opacity:1}
-:global(.dark) .table-frame{border-color:rgba(153,161,190,.22);background:#151821}
-:global(.dark) .model-row th,:global(.dark) .metric-row th{background:#1a1e29;color:#e8ebf6;border-color:rgba(153,161,190,.22)}
-:global(.dark) .model-row .agent-heading,:global(.dark) .metric-row th{color:#9da6bd}
-:global(.dark) .model-heading.model-active{background:#28264f;color:#b8b6ff}
-:global(.dark) .model-heading.model-active::after{border-color:#6965e8;background:rgba(89,108,255,.12)}
-:global(.dark) .metric-heading.model-active{background:#242341;color:#b8b6ff}
-:global(.dark) .agent-name{color:#eef0f7}
-:global(.dark) tbody td{color:#c3c9d9}
-:global(.dark) tbody td.final{background:#242a3a;color:#cbd2e4}
-:global(.dark) .dumate .agent-name{color:#aeb5ff}
-:global(.dark) .dumate td{background:#24243d;color:#e0e2f2}
-:global(.dark) .dumate td.final{background:#303050;color:#f0efff}
-@media(max-width:760px){.table-frame{border-radius:10px}table{min-width:1040px}th,td{padding:12px 10px;font-size:12px}.model-row th{height:56px;font-size:16px}.metric-row th{height:42px;font-size:9px}}
+.leaderboard-figure {
+  width: 100%;
+  max-width: 760px;
+  margin: 26px 0 0;
+}
+
+.leaderboard-card {
+  overflow: hidden;
+  border: 1px solid var(--db-border);
+  border-radius: 16px;
+  background: var(--db-bg);
+  box-shadow: 0 10px 30px rgba(29, 35, 66, 0.05);
+}
+
+.leaderboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--db-border);
+  background: color-mix(in srgb, var(--db-bg-soft) 62%, var(--db-bg));
+}
+
+.model-title {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  gap: 10px;
+}
+
+.model-kicker {
+  display: inline-block;
+  margin: 0;
+  white-space: nowrap;
+  color: var(--db-text-muted);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.leaderboard-heading h2 {
+  margin: 0;
+  color: var(--db-text);
+  font-size: clamp(19px, 2.2vw, 23px);
+  font-weight: 780;
+  letter-spacing: -.03em;
+}
+
+.metric-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 14px 18px;
+  color: var(--db-text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.legend-dot.metric-partial { color: var(--db-electric-blue); }
+.legend-dot.metric-judge { color: #7d64db; }
+.legend-dot.metric-final { color: #2eb89a; }
+
+.score-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 30px minmax(130px, 170px) minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 92px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--db-border);
+  transition: background-color .18s ease;
+}
+
+.score-row:last-child { border-bottom: 0; }
+.score-row:hover { background: color-mix(in srgb, var(--db-blue-soft) 42%, var(--db-bg)); }
+.score-row.dumate { background: color-mix(in srgb, var(--db-purple-soft) 38%, var(--db-bg)); }
+.score-row.dumate:hover { background: color-mix(in srgb, var(--db-purple-soft) 58%, var(--db-bg)); }
+
+.rank {
+  color: var(--db-text-muted);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.score-row:first-child .rank {
+  color: var(--db-primary);
+  font-weight: 800;
+}
+
+.harness-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+}
+
+.harness-name strong {
+  overflow: hidden;
+  color: var(--db-text);
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-row.dumate .harness-name strong { color: var(--db-primary); }
+
+.featured-badge {
+  border: 1px solid color-mix(in srgb, var(--db-primary) 18%, transparent);
+  border-radius: 999px;
+  padding: 3px 7px;
+  color: var(--db-primary);
+  background: var(--db-purple-soft);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .03em;
+}
+
+.metric-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.metric-line {
+  display: grid;
+  grid-template-columns: 58px minmax(80px, 1fr) 52px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.metric-label {
+  color: var(--db-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.metric-track {
+  position: relative;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--db-text-muted) 17%, var(--db-bg));
+}
+
+.metric-fill {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+  border-radius: inherit;
+  transition: width .3s ease;
+}
+
+.metric-fill.metric-partial { background: var(--db-electric-blue); }
+.metric-fill.metric-judge { background: #7d64db; }
+.metric-fill.metric-final { background: #2eb89a; }
+.metric-fill.best { filter: saturate(1.15) brightness(.94); }
+
+.metric-value {
+  color: var(--db-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.metric-value.best {
+  color: var(--db-text);
+  font-weight: 800;
+}
+
+.model-switcher {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  max-width: 100%;
+  margin: 14px auto 0;
+  padding: 4px;
+  border: 1px solid var(--db-border);
+  border-radius: 999px;
+  background: var(--db-bg);
+  box-shadow: 0 8px 24px rgba(29, 35, 66, 0.06);
+}
+
+.model-switcher button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 13px;
+  color: var(--db-text-secondary);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  transition: color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+.model-switcher button:hover,
+.model-switcher button:focus-visible {
+  color: var(--db-primary);
+  outline: none;
+  background: var(--db-blue-soft);
+}
+
+.model-switcher button.active {
+  color: #fff;
+  background: var(--db-primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--db-primary) 28%, transparent);
+}
+
+:global(.dark) .leaderboard-card,
+:global(.dark) .model-switcher {
+  border-color: rgba(153, 161, 190, .2);
+  background: #171b26;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .16);
+}
+
+:global(.dark) .leaderboard-heading {
+  border-color: rgba(153, 161, 190, .18);
+  background: #1d2230;
+}
+
+:global(.dark) .score-row { border-color: rgba(153, 161, 190, .16); }
+:global(.dark) .score-row:hover { background: #1d2230; }
+:global(.dark) .score-row.dumate { background: #171b26; }
+:global(.dark) .score-row.dumate:hover { background: #1d2230; }
+:global(.dark) .score-row.dumate .harness-name strong { color: #b8bee1; }
+:global(.dark) .metric-track { background: #303644; }
+:global(.dark) .metric-value.best { color: #f0f2fb; }
+:global(.dark) .featured-badge { border-color: #363c50; color: #aeb6df; background: #242934; }
+:global(.dark) .model-switcher button:hover,
+:global(.dark) .model-switcher button:focus-visible { background: #28264f; }
+
+@media (max-width: 760px) {
+  .leaderboard-figure { max-width: 100%; }
+  .leaderboard-card { border-radius: 13px; }
+  .leaderboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .metric-legend { justify-content: flex-start; }
+  .score-row {
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 0;
+    padding: 14px 18px;
+  }
+  .metric-stack { grid-column: 2; }
+  .harness-name strong { font-size: 16px; }
+  .metric-line { grid-template-columns: 56px minmax(70px, 1fr) 48px; gap: 7px; }
+  .model-switcher {
+    width: 100%;
+    border-radius: 13px;
+  }
+  .model-switcher button { flex: 1 1 44%; }
+}
 </style>

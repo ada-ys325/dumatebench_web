@@ -9,9 +9,43 @@ html[lang='zh-CN'] .caption-best {
   margin-left: 0 !important;
 }
 
-.VPSidebar,
-.VPDocAside {
+.VPSidebar {
   display: none !important;
+}
+
+/* Overview uses VitePress' native outline on the left as a section navigator. */
+@media (min-width: 1280px) {
+  .VPDoc.has-aside .container {
+    max-width: 1160px;
+  }
+
+  .VPDoc.has-aside .left-aside {
+    max-width: 248px;
+    padding-right: 36px;
+  }
+
+  .VPDoc.has-aside .left-aside .aside-container {
+    width: 212px;
+  }
+
+  .VPDoc.has-aside .left-aside .outline-title {
+    color: var(--db-text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .VPDoc.has-aside .left-aside .outline-link {
+    color: var(--db-text-secondary);
+    line-height: 34px;
+    font-size: 13px;
+  }
+
+  .VPDoc.has-aside .left-aside .outline-link:hover,
+  .VPDoc.has-aside .left-aside .outline-link.active {
+    color: var(--db-primary);
+  }
 }
 
 .VPDoc {
@@ -35,6 +69,11 @@ html[lang='zh-CN'] .caption-best {
   transform: translateX(-50%);
 }
 
+/* Keep the leaderboard aligned with the article copy instead of the full site shell. */
+.vp-doc .site-shell.leaderboard-figure {
+  max-width: 760px !important;
+}
+
 /* Keep dark-mode score cells in the same restrained dark palette as the table. */
 html.dark .leaderboard-figure .table-wrap,
 body.dark .leaderboard-figure .table-wrap { background: #151821 !important; border-color: #303746 !important; }
@@ -48,6 +87,20 @@ html.dark .leaderboard-figure td:not(.final),
 body.dark .leaderboard-figure td:not(.final) { background: #1b1e27 !important; }
 html.dark .leaderboard-figure th,
 body.dark .leaderboard-figure th { background: #191d27 !important; border-color: #303746 !important; }
+
+/* In dark mode all harness rows share the same neutral surface; hover is intentionally subtle. */
+html.dark .leaderboard-figure .score-row,
+body.dark .leaderboard-figure .score-row { background: #171b26 !important; }
+html.dark .leaderboard-figure .score-row:hover,
+body.dark .leaderboard-figure .score-row:hover { background: #1d2230 !important; }
+html.dark .leaderboard-figure .score-row.dumate,
+body.dark .leaderboard-figure .score-row.dumate { background: #171b26 !important; }
+html.dark .leaderboard-figure .score-row.dumate:hover,
+body.dark .leaderboard-figure .score-row.dumate:hover { background: #1d2230 !important; }
+html.dark .leaderboard-figure .score-row.dumate .harness-name strong,
+body.dark .leaderboard-figure .score-row.dumate .harness-name strong { color: #b8bee1 !important; }
+html.dark .leaderboard-figure .featured-badge,
+body.dark .leaderboard-figure .featured-badge { border-color: #363c50 !important; color: #aeb6df !important; background: #242934 !important; }
 
 @media (max-width: 760px) {
   .VPDoc {
