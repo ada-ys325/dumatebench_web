@@ -2,34 +2,34 @@
   "models": ["GPT-5.5", "Opus-4.8", "GLM-5.2", "DeepSeek-V4-Pro"],
   "rows": [
     { "agent": "Claude Code", "scores": {
-      "GPT-5.5": { "passRate": 0.8240, "judge": 0.7494, "final": 0.7867 },
-      "Opus-4.8": { "passRate": 0.8357, "judge": 0.7884, "final": 0.8121 },
-      "GLM-5.2": { "passRate": 0.7015, "judge": 0.6398, "final": 0.6707 },
-      "DeepSeek-V4-Pro": { "passRate": 0.8478, "judge": 0.7811, "final": 0.8145 }
+      "GPT-5.5": { "partial": 0.8613, "judge": 0.7494, "final": 0.7830 },
+      "Opus-4.8": { "partial": 0.8734, "judge": 0.7884, "final": 0.8139 },
+      "GLM-5.2": { "partial": 0.7317, "judge": 0.6398, "final": 0.6674 },
+      "DeepSeek-V4-Pro": { "partial": 0.8373, "judge": 0.7915, "final": 0.8052 }
     }},
     { "agent": "Hermes", "scores": {
-      "GPT-5.5": { "passRate": 0.8599, "judge": 0.7634, "final": 0.8117 },
-      "Opus-4.8": { "passRate": 0.8609, "judge": 0.7836, "final": 0.8223 },
-      "GLM-5.2": { "passRate": 0.7877, "judge": 0.7213, "final": 0.7545 },
-      "DeepSeek-V4-Pro": { "passRate": 0.8689, "judge": 0.7687, "final": 0.8188 }
+      "GPT-5.5": { "partial": 0.9001, "judge": 0.7634, "final": 0.8044 },
+      "Opus-4.8": { "partial": 0.8986, "judge": 0.7836, "final": 0.8181 },
+      "GLM-5.2": { "partial": 0.8253, "judge": 0.7213, "final": 0.7525 },
+      "DeepSeek-V4-Pro": { "partial": 0.8521, "judge": 0.8096, "final": 0.8223 }
     }},
     { "agent": "DuMate", "scores": {
-      "GPT-5.5": { "passRate": 0.8636, "judge": 0.7768, "final": 0.8202 },
-      "Opus-4.8": { "passRate": 0.8686, "judge": 0.8316, "final": 0.8501 },
-      "GLM-5.2": { "passRate": 0.8465, "judge": 0.7711, "final": 0.8088 },
-      "DeepSeek-V4-Pro": { "passRate": 0.8276, "judge": 0.8229, "final": 0.8253 }
+      "GPT-5.5": { "partial": 0.9025, "judge": 0.7768, "final": 0.8145 },
+      "Opus-4.8": { "partial": 0.9088, "judge": 0.8316, "final": 0.8548 },
+      "GLM-5.2": { "partial": 0.8829, "judge": 0.7711, "final": 0.8046 },
+      "DeepSeek-V4-Pro": { "partial": 0.8631, "judge": 0.8229, "final": 0.8350 }
     }},
-    { "agent": "Opencode", "scores": {
-      "GPT-5.5": { "passRate": 0.7385, "judge": 0.6768, "final": 0.7077 },
-      "Opus-4.8": { "passRate": 0.6882, "judge": 0.5986, "final": 0.6434 },
-      "GLM-5.2": { "passRate": 0.7963, "judge": 0.6822, "final": 0.7393 },
-      "DeepSeek-V4-Pro": { "passRate": 0.8373, "judge": 0.7416, "final": 0.7895 }
+    { "agent": "OpenCode", "scores": {
+      "GPT-5.5": { "partial": 0.7696, "judge": 0.6568, "final": 0.6906 },
+      "Opus-4.8": { "partial": 0.8555, "judge": 0.7736, "final": 0.7982 },
+      "GLM-5.2": { "partial": 0.8613, "judge": 0.7396, "final": 0.7761 },
+      "DeepSeek-V4-Pro": { "partial": 0.8721, "judge": 0.7716, "final": 0.8017 }
     }},
     { "agent": "OpenClaw", "scores": {
-      "GPT-5.5": { "passRate": 0.7935, "judge": 0.7590, "final": 0.7763 },
-      "Opus-4.8": { "passRate": 0.5951, "judge": 0.5690, "final": 0.5821 },
-      "GLM-5.2": { "passRate": 0.7330, "judge": 0.7075, "final": 0.7203 },
-      "DeepSeek-V4-Pro": { "passRate": 0.8515, "judge": 0.8213, "final": 0.8364 }
+      "GPT-5.5": { "partial": 0.8279, "judge": 0.7590, "final": 0.7797 },
+      "Opus-4.8": { "partial": 0.6127, "judge": 0.5690, "final": 0.5821 },
+      "GLM-5.2": { "partial": 0.7668, "judge": 0.7075, "final": 0.7253 },
+      "DeepSeek-V4-Pro": { "partial": 0.8090, "judge": 0.7800, "final": 0.7887 }
     }}
   ]
 }

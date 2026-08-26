@@ -4,6 +4,11 @@
   margin-bottom: 18px;
 }
 
+/* Keep the English caption readable without adding a gap in Chinese text. */
+html[lang='zh-CN'] .caption-best {
+  margin-left: 0 !important;
+}
+
 .VPSidebar,
 .VPDocAside {
   display: none !important;
