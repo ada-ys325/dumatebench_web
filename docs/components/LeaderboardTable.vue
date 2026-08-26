@@ -5,6 +5,8 @@ import leaderboard from '../data/leaderboard.json'
 type Metric = 'partial' | 'judge' | 'final'
 type Score = Record<Metric, number>
 type LeaderboardRow = (typeof leaderboard.rows)[number]
+type Model = (typeof leaderboard.models)[number]
+type ViewMode = 'harness' | 'model'
 
 const metrics: Array<{ key: Metric; label: string }> = [
   { key: 'partial', label: 'Partial' },
@@ -12,18 +14,36 @@ const metrics: Array<{ key: Metric; label: string }> = [
   { key: 'final', label: 'Final' }
 ]
 
-const selectedModel = ref(leaderboard.models[0])
+const viewMode = ref<ViewMode>('harness')
+const selectedModel = ref<Model>(leaderboard.models[0])
+const selectedHarness = ref<LeaderboardRow['agent']>(leaderboard.rows[0].agent)
 
 function scoresFor(row: LeaderboardRow): Score {
   return row.scores[selectedModel.value as keyof typeof row.scores] as Score
+}
+
+const selectedHarnessRow = computed(() => {
+  return leaderboard.rows.find((row) => row.agent === selectedHarness.value) ?? leaderboard.rows[0]
+})
+
+function scoresForModel(model: Model): Score {
+  return selectedHarnessRow.value.scores[model] as Score
 }
 
 const selectedRows = computed(() => {
   return [...leaderboard.rows].sort((a, b) => scoresFor(b).final - scoresFor(a).final)
 })
 
-function isBest(metric: Metric, value: number) {
+const selectedModelRows = computed(() => {
+  return [...leaderboard.models].sort((a, b) => scoresForModel(b).final - scoresForModel(a).final)
+})
+
+function isBestHarness(metric: Metric, value: number) {
   return value === Math.max(...leaderboard.rows.map((row) => scoresFor(row)[metric]))
+}
+
+function isBestModel(metric: Metric, value: number) {
+  return value === Math.max(...leaderboard.models.map((model) => scoresForModel(model)[metric]))
 }
 
 function formatPercent(value: number) {
@@ -36,18 +56,40 @@ function formatPercent(value: number) {
     <div class="leaderboard-card">
       <header class="leaderboard-heading">
         <div class="model-title">
-          <span class="model-kicker">Base model</span>
-          <h2>{{ selectedModel }}</h2>
+          <span class="model-kicker">{{ viewMode === 'harness' ? 'Base model' : 'Harness' }}</span>
+          <h2>{{ viewMode === 'harness' ? selectedModel : selectedHarness }}</h2>
         </div>
-        <div class="metric-legend" aria-label="Metrics">
-          <span v-for="metric in metrics" :key="metric.key" class="legend-item">
-            <i class="legend-dot" :class="`metric-${metric.key}`" aria-hidden="true" />
-            {{ metric.label }}
-          </span>
+        <div class="heading-tools">
+          <div class="view-switcher" role="tablist" aria-label="Leaderboard view">
+            <button
+              type="button"
+              role="tab"
+              :aria-selected="viewMode === 'harness'"
+              :class="{ active: viewMode === 'harness' }"
+              @click="viewMode = 'harness'"
+            >
+              View by harness
+            </button>
+            <button
+              type="button"
+              role="tab"
+              :aria-selected="viewMode === 'model'"
+              :class="{ active: viewMode === 'model' }"
+              @click="viewMode = 'model'"
+            >
+              View by base model
+            </button>
+          </div>
+          <div class="metric-legend" aria-label="Metrics">
+            <span v-for="metric in metrics" :key="metric.key" class="legend-item">
+              <i class="legend-dot" :class="`metric-${metric.key}`" aria-hidden="true" />
+              {{ metric.label }}
+            </span>
+          </div>
         </div>
       </header>
 
-      <div class="score-list">
+      <div v-if="viewMode === 'harness'" class="score-list">
         <article
           v-for="(row, index) in selectedRows"
           :key="row.agent"
@@ -72,12 +114,47 @@ function formatPercent(value: number) {
               >
                 <span
                   class="metric-fill"
-                  :class="[`metric-${metric.key}`, { best: isBest(metric.key, scoresFor(row)[metric.key]) }]"
+                  :class="[`metric-${metric.key}`, { best: isBestHarness(metric.key, scoresFor(row)[metric.key]) }]"
                   :style="{ width: `${scoresFor(row)[metric.key] * 100}%` }"
                 />
               </div>
-              <strong class="metric-value" :class="{ best: isBest(metric.key, scoresFor(row)[metric.key]) }">
+              <strong class="metric-value" :class="{ best: isBestHarness(metric.key, scoresFor(row)[metric.key]) }">
                 {{ formatPercent(scoresFor(row)[metric.key]) }}
+              </strong>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div v-else class="score-list">
+        <article
+          v-for="(model, index) in selectedModelRows"
+          :key="model"
+          class="score-row model-score-row"
+        >
+          <div class="rank" :aria-label="`Rank ${index + 1}`">{{ index + 1 }}</div>
+          <div class="harness-name">
+            <strong>{{ model }}</strong>
+          </div>
+          <div class="metric-stack">
+            <div v-for="metric in metrics" :key="metric.key" class="metric-line">
+              <span class="metric-label">{{ metric.label }}</span>
+              <div
+                class="metric-track"
+                role="progressbar"
+                :aria-label="`${model} ${metric.label}`"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                :aria-valuenow="Math.round(scoresForModel(model)[metric.key] * 1000) / 10"
+              >
+                <span
+                  class="metric-fill"
+                  :class="[`metric-${metric.key}`, { best: isBestModel(metric.key, scoresForModel(model)[metric.key]) }]"
+                  :style="{ width: `${scoresForModel(model)[metric.key] * 100}%` }"
+                />
+              </div>
+              <strong class="metric-value" :class="{ best: isBestModel(metric.key, scoresForModel(model)[metric.key]) }">
+                {{ formatPercent(scoresForModel(model)[metric.key]) }}
               </strong>
             </div>
           </div>
@@ -85,7 +162,7 @@ function formatPercent(value: number) {
       </div>
     </div>
 
-    <div class="model-switcher" role="tablist" aria-label="Base model">
+    <div v-if="viewMode === 'harness'" class="model-switcher" role="tablist" aria-label="Base model">
       <button
         v-for="model in leaderboard.models"
         :key="model"
@@ -96,6 +173,20 @@ function formatPercent(value: number) {
         @click="selectedModel = model"
       >
         {{ model }}
+      </button>
+    </div>
+
+    <div v-else class="model-switcher" role="tablist" aria-label="Harness">
+      <button
+        v-for="row in leaderboard.rows"
+        :key="row.agent"
+        type="button"
+        role="tab"
+        :aria-selected="selectedHarness === row.agent"
+        :class="{ active: selectedHarness === row.agent }"
+        @click="selectedHarness = row.agent"
+      >
+        {{ row.agent }}
       </button>
     </div>
   </figure>
@@ -160,6 +251,50 @@ function formatPercent(value: number) {
   color: var(--db-text-secondary);
   font-size: 12px;
   font-weight: 650;
+}
+
+.heading-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.view-switcher {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--db-border);
+  border-radius: 10px;
+  background: var(--db-bg);
+}
+
+.view-switcher button {
+  min-height: 28px;
+  border: 0;
+  border-radius: 7px;
+  padding: 5px 9px;
+  color: var(--db-text-secondary);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color .18s ease, background-color .18s ease;
+}
+
+.view-switcher button:hover,
+.view-switcher button:focus-visible {
+  color: var(--db-primary);
+  outline: none;
+  background: var(--db-blue-soft);
+}
+
+.view-switcher button.active {
+  color: #fff;
+  background: var(--db-primary);
 }
 
 .legend-item {
@@ -353,6 +488,10 @@ function formatPercent(value: number) {
   background: #1d2230;
 }
 
+:global(.dark) .view-switcher { border-color: rgba(153, 161, 190, .2); background: #171b26; }
+:global(.dark) .view-switcher button:hover,
+:global(.dark) .view-switcher button:focus-visible { background: #28264f; }
+
 :global(.dark) .score-row { border-color: rgba(153, 161, 190, .16); }
 :global(.dark) .score-row:hover { background: #1d2230; }
 :global(.dark) .score-row.dumate { background: #171b26; }
@@ -373,6 +512,9 @@ function formatPercent(value: number) {
     gap: 8px;
     padding: 12px 16px;
   }
+  .heading-tools { width: 100%; align-items: flex-start; }
+  .view-switcher { width: 100%; }
+  .view-switcher button { flex: 1 1 0; }
   .metric-legend { justify-content: flex-start; }
   .score-row {
     grid-template-columns: 26px minmax(0, 1fr);
