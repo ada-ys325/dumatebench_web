@@ -3,10 +3,10 @@ export const site = {
   tagline: 'Benchmarking AI Agents in Real-World Work Environments',
   description: 'A benchmark for evaluating AI agents across realistic tasks and environments.',
   domain: 'https://dumatebench.com',
-  links: { github: 'https://github.com/baidubce/dumate-bench', paper: 'TBD', dataset: 'https://huggingface.co/datasets/Annihi/dumate_bench', contact: 'TBD' },
+  links: { github: 'https://github.com/baidubce/dumate-bench', paper: 'https://arxiv.org/abs/2608.26546', dataset: 'https://huggingface.co/datasets/Annihi/dumate_bench', contact: 'TBD' },
   nav: [
     { text: 'Home', link: '/' }, { text: 'Overview', link: '/overview' }, { text: 'Leaderboard', link: '/leaderboard' },
-    { text: 'Paper', link: '/paper' }, { text: 'Dataset', link: 'https://huggingface.co/datasets/Annihi/dumate_bench' },
+    { text: 'Paper', link: 'https://arxiv.org/abs/2608.26546' }, { text: 'Dataset', link: 'https://huggingface.co/datasets/Annihi/dumate_bench' },
     { text: 'Code', link: 'https://github.com/baidubce/dumate-bench' }
   ]
 }

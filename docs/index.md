@@ -3,7 +3,7 @@
 <main class="site-shell home-page">
 <section class="home-section home-intro">
 <div class="section-heading"><p>DuMateBench evaluates whether autonomous agents can coordinate tools, produce artifacts, and recover from failures across realistic end-to-end workflows.</p></div>
-<div class="home-links"><a href="/overview"><strong>Overview</strong><span>Scope, task design, and evaluation protocol →</span></a><a href="/leaderboard"><strong>Leaderboard</strong><span>Results across five agents and four base models →</span></a><a href="/paper"><strong>Paper</strong><span>Read the benchmark paper and citation details →</span></a><a href="https://huggingface.co/datasets/Annihi/dumate_bench"><strong>Dataset</strong><span>Open the released task data →</span></a></div>
+<div class="home-links"><a href="/overview"><strong>Overview</strong><span>Scope, task design, and evaluation protocol →</span></a><a href="/leaderboard"><strong>Leaderboard</strong><span>Results across five agents and four base models →</span></a><a href="https://arxiv.org/abs/2608.26546"><strong>Paper</strong><span>Read the benchmark paper and citation details →</span></a><a href="https://huggingface.co/datasets/Annihi/dumate_bench"><strong>Dataset</strong><span>Open the released task data →</span></a></div>
 </section>
 
 <section class="home-section home-contributions">

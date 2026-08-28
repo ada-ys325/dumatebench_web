@@ -13,7 +13,7 @@
 ## Links
 
 - PDF: **TBD**
-- arXiv: **TBD**
+- arXiv: [DuMateBench on arXiv](https://arxiv.org/abs/2608.26546)
 - Code: **TBD**
 - Dataset: [Hugging Face dataset](https://huggingface.co/datasets/Annihi/dumate_bench)
 
